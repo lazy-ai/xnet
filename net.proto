@@ -1,0 +1,51 @@
+syntax = "proto2";
+
+message TensorProto {
+    enum DataType {
+        UNDEFINED = 0;
+        FLOAT = 1;
+        DOUBLE = 2;
+        INT8 = 3;
+        INT16 = 4;
+        INT32 = 5;
+        STRING = 6;
+    }
+
+    repeated int32 shape = 1;
+    required DataType data_type = 2;
+
+    repeated float float_data = 3 [packed = true];
+    repeated double double_data = 4 [packed = true];
+    // FOR INT8, INT16, INT32
+    repeated int32 int32_data = 5 [packed = true];
+    repeated string string_data = 6;
+}
+
+message FullyConnectParameter {
+    required TensorProto weight = 1; // weight
+    optional TensorProto bias = 2;
+}
+
+message NodeProto {
+    enum NodeType {
+        UNKNOWN = 0;
+        FULLY_CONNECT = 1;
+        QUANTIZE_FULLY_CONNECT = 2; // 8bit quantize
+        RELU = 3;
+        SIGMOID = 4;
+        TANH = 5;
+        SOFTMAX = 6;
+    }
+    required string name = 1;    
+    required NodeType node_type = 2;
+
+    optional FullyConnectParameter fully_connect_param = 16;
+}
+
+message NetProto {
+    optional int32 version = 1;
+    optional string name = 2;
+    optional string doc = 3;
+    repeated NodeProto nodes = 4;
+}
+
