@@ -26,6 +26,13 @@ message FullyConnectParameter {
     optional TensorProto bias = 2;
 }
 
+message QuantizeFullyConnectParameter {
+    required TensorProto weight = 1; // weight
+    optional TensorProto bias = 2;
+    required float w_scale = 3; // scale for quantize weight
+    required float w_zero_point = 4; // zeros point for quantize weight
+}
+
 message NodeProto {
     enum NodeType {
         UNKNOWN = 0;
@@ -36,16 +43,21 @@ message NodeProto {
         TANH = 5;
         SOFTMAX = 6;
     }
-    required string name = 1;    
+    optional string name = 1;    
     required NodeType node_type = 2;
+    repeated string input = 3;
+    repeated string output = 4;
 
     optional FullyConnectParameter fully_connect_param = 16;
+    optional QuantizeFullyConnectParameter quantize_fully_connect_param = 17;
 }
 
 message NetProto {
     optional int32 version = 1;
     optional string name = 2;
     optional string doc = 3;
-    repeated NodeProto nodes = 4;
+    repeated string input = 4; // input node name
+    repeated string output = 5; // output node name
+    repeated NodeProto nodes = 6;
 }
 

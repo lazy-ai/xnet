@@ -21,10 +21,6 @@ public:
 template <> \
 TensorProto_DataType ParseType<type>::Type() { return TensorProto::data_type; }
 
-PARSE_TYPE(float, FLOAT)
-PARSE_TYPE(int32_t, INT32)
-PARSE_TYPE(uint8_t, INT8)
-
 template <class DType, int32_t Dim>
 class Tensor {
 public:

@@ -9,6 +9,8 @@ int main(int argc, char *argv[]) {
     XNet xnet;
     xnet.Read(argv[1]);
     google::protobuf::ShutdownProtobufLibrary();
+
+    xnet.Info();
     return 0;
 }
 

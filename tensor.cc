@@ -7,6 +7,10 @@
 #include <cblas.h>
 #endif
 
+PARSE_TYPE(float, FLOAT)
+PARSE_TYPE(int32_t, INT32)
+PARSE_TYPE(uint8_t, INT8)
+
 template <class DType, int32_t Dim>
 void Tensor<DType, Dim>::Resize(const std::vector<int32_t> &shape) {
     CHECK(shape_.size() == Dim);
