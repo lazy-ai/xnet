@@ -187,7 +187,7 @@ void Vector<DType>::Scale(float alpha) {
     }
 }
 
-void FindMinMax(float *data, int n, float *min, float *max) {
+static void FindMinMax(float *data, int n, float *min, float *max) {
     *min = *max = data[0];
     for (int i = 1; i < n; i++) {
         if (data[i] > *max) *max = data[i];
@@ -195,7 +195,7 @@ void FindMinMax(float *data, int n, float *min, float *max) {
     }
 }
 
-void ChooseQuantizationParams(float min, float max, 
+static void ChooseQuantizationParams(float min, float max, 
         float *scale, uint8_t *zero_point) {
     min = std::min(min, 0.f);
     max = std::max(max, 0.f);
@@ -230,8 +230,7 @@ void QuantizeData(float *src, int n, float *scale,
     }
 }
 
-template <typename DType>
-void DequantizeData(DType *src, int n, float scale,
+void DequantizeData(int32_t *src, int n, float scale,
         uint8_t zero_point, float *dest) {
     for (int i = 0; i < n; i++) {
         dest[i] = scale * (src[i] - zero_point);

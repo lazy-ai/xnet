@@ -19,18 +19,24 @@ message TensorProto {
     // FOR INT8, INT16, INT32
     repeated int32 int32_data = 5 [packed = true];
     repeated string string_data = 6;
+
 }
+
+message QuantizeTensorProto {
+    required TensorProto tensor = 1;
+    required float scale = 2; // scale factor of the quantize tensor
+    required int32 zero_point = 3; // zero point of the quantize tensor
+};
 
 message FullyConnectParameter {
     required TensorProto weight = 1; // weight
     optional TensorProto bias = 2;
 }
 
+// Only weight is quantized
 message QuantizeFullyConnectParameter {
-    required TensorProto weight = 1; // weight
+    required QuantizeTensorProto weight = 1;
     optional TensorProto bias = 2;
-    required float w_scale = 3; // scale for quantize weight
-    required float w_zero_point = 4; // zeros point for quantize weight
 }
 
 message NodeProto {

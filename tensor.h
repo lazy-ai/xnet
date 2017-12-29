@@ -10,6 +10,7 @@
 
 #include "utils.h"
 #include "net.pb.h"
+#include "third_party/gemmlowp/public/gemmlowp.h"
 
 template <class DType>
 class ParseType {
@@ -25,6 +26,9 @@ template <class DType, int32_t Dim>
 class Tensor {
 public:
     Tensor(DType *data=nullptr): data_(data), shape_(Dim, 0), holder_(false) {}
+    Tensor(const Tensor<DType, Dim> &tensor) {
+        CopyFrom(tensor);
+    }
     ~Tensor() {
         if (holder_ && data_ != nullptr) delete [] data_;
     }
@@ -36,7 +40,7 @@ public:
     }
     DType *Data() const { return data_; } 
     std::vector<int32_t> Shape() const { return shape_; }
-    void CopyFrom(const Tensor<DType, Dim> &tensor); 
+    virtual void CopyFrom(const Tensor<DType, Dim> &tensor); 
 protected:
     int32_t GetShapeSize(const std::vector<int32_t> &shape) const;
 protected:
@@ -112,11 +116,35 @@ public:
 };
 
 // Quantization Functions
-void FindMinMax(float *data, int n, float *min, float *max);
-void ChooseQuantizationParams(float min, float max, float *scale, 
-                              uint8_t *zero_point);
-void QuantizeData(float *src, int n, float scale, uint8_t zero_point, 
-                  uint8_t *dest);
+void QuantizeData(float *src, int n, float *scale, 
+        uint8_t *zero_point, uint8_t *dest); 
+
+void DequantizeData(int32_t *src, int n, float scale,
+        uint8_t zero_point, float *dest); 
+
+// @params transpose: if mat2 need transpose
+template <bool transpose>
+void IntegerGemm(const Matrix<uint8_t> &mat1, const Matrix<uint8_t> &mat2, 
+        int offset1, int offset2, Matrix<int32_t> *out) {
+    assert((!transpose && mat1.NumCols() == mat2.NumRows() && 
+            out->NumRows() == mat1.NumRows() && out->NumCols() == mat2.NumCols()) ||
+            (transpose && mat1.NumCols() == mat2.NumCols() && 
+            out->NumRows() == mat1.NumRows() && out->NumCols() == mat2.NumRows()));
+    using namespace gemmlowp;
+    //left(right)-hand side
+    MatrixMap<const uint8_t, MapOrder::RowMajor> 
+        lhs(mat1.Data(), mat1.NumRows(), mat1.NumCols(), mat2.NumCols());
+    MatrixMap<const uint8_t, !transpose ? MapOrder::RowMajor : MapOrder::ColMajor> 
+        rhs(mat2.Data(), !transpose ? mat2.NumRows() : mat2.NumCols(), 
+        !transpose ? mat2.NumCols() : mat2.NumRows(), 
+        !transpose ? mat2.NumCols() : mat2.NumCols());
+    MatrixMap<int32_t, MapOrder::RowMajor>
+        result(out->Data(), out->NumRows(), out->NumCols(), out->NumCols());
+    const std::tuple<> empty_pipeline = {};
+    GemmContext context;
+    GemmWithOutputPipeline<uint8_t, int32_t, DefaultL8R8BitDepthParams>(
+        &context, lhs, rhs, &result, -offset1, -offset2, empty_pipeline);
+}
 
 #endif
 

@@ -27,7 +27,7 @@
 
 #define CHECK(test) \
     do { \
-        if (!test) { \
+        if (!(test)) { \
             fprintf(stderr, "CHECK (%s: %s(): %d) %s \n", \
                     __FILE__, __func__, __LINE__, #test); \
                 exit(-1); \

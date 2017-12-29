@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
     XNet xnet;
-    xnet.Read(argv[1]);
+    xnet.FromProto(argv[1]);
     google::protobuf::ShutdownProtobufLibrary();
 
     xnet.Info();
