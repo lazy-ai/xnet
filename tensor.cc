@@ -151,9 +151,9 @@ void Matrix<DType>::AddVec(const Vector<DType> &vec) {
 template <>
 void Matrix<float>::Mul(const Matrix<float> &mat1, const Matrix<float> &mat2, 
         bool transpose, float alpha) {
-    CHECK((!transpose && mat1.NumCols() == mat2.NumRows() && 
-            NumRows() == mat1.NumRows() && NumCols() == mat2.NumCols()) ||
-            (transpose && mat1.NumCols() == mat2.NumCols() && 
+    CHECK(transpose || (mat1.NumCols() == mat2.NumRows() && 
+            NumRows() == mat1.NumRows() && NumCols() == mat2.NumCols())); 
+    CHECK(!transpose || (mat1.NumCols() == mat2.NumCols() && 
             NumRows() == mat1.NumRows() && NumCols() == mat2.NumRows()));
     cblas_sgemm(CblasRowMajor, CblasNoTrans, !transpose ? CblasNoTrans : CblasTrans,
                 NumRows(), NumCols(), mat1.NumCols(), 1.0, 

@@ -88,7 +88,7 @@ public:
     virtual void FromProtoFunc(const NodeProto &proto);
     void ToProtoFunc(NodeProto *proto) const; 
     void SetWeight(const Matrix<uint8_t> &weight) { weight_.CopyFrom(weight); }
-    void SetBias(const Vector<float> &bias) { bias_.CopyFrom(bias_); }
+    void SetBias(const Vector<float> &bias) { bias_.CopyFrom(bias); }
     void SetWeightScale(float scale) { w_scale_ = scale; };
     void SetWeightZeroPoint(uint8_t zero_point) { w_zero_point_ = zero_point; }
     void SetHasBias(bool has_bias) { has_bias_ = has_bias; }

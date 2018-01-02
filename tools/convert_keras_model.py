@@ -100,6 +100,6 @@ if __name__ == '__main__':
     with open(sys.argv[2], 'wb') as fid:
         fid.write(xnet_model.SerializeToString())
     
-    json_string = json_format.MessageToJson(xnet_model)
+    #json_string = json_format.MessageToJson(xnet_model)
     #print(json_string)
 
